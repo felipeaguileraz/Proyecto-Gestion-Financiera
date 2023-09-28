@@ -1,6 +1,6 @@
 ---
 title: "Proyecto Gestión Financiera"
-author: "Felipe Aguilera Z. "
+author: "Felipe Aguilera Z."
 format: html
 editor: visual
 ---
