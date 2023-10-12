@@ -3,6 +3,8 @@ title: "Proyecto Gestión Financiera"
 author: "Felipe Aguilera Z."
 format: html
 editor: visual
+lang: es
+bibliography: references.bib
 ---
 
 ```{r configuraciones}
@@ -21,7 +23,7 @@ Fecha de entrega: Jueves 28 de Septiembre 23:59.
 
 ### Definición
 
-Banco Santander es una de los bancos más grandes del mundo, debido a su gran presencia en múltiples países. Este es un banco de origen español, que tiene sedes en Chile. Es por esto, que en el IPSA, se puede encontrar como "BSANTANDER", que hace referencia a la empresa "BANCO SANTANDER CHILE", y no solamente "BANCO SANTANDER". En Chile, es el banco más grande del país. Este banco pertenece a la industria de la banca (industria financiera), cuyo sector ofrece servicios financieros, como por ejemplo ofrecer prestamos personales. En "[Web of Science](https://www.webofscience.com/wos/woscc/full-record/WOS:000436492100012)", encontré un articulo sobre el efecto de bancos extranjeros en la "performance" o rendimiento de bancos, en paises en vías de desarrollo, el cual explicaré un poco mas a fondo en la sección de motivación. Lo interesante del paper es que analiza el efecto de bancos extranjeros en Chile.
+Banco Santander es una de los bancos más grandes del mundo, debido a su gran presencia en múltiples países. Este es un banco de origen español, que tiene sedes en Chile. Es por esto, que en el IPSA, se puede encontrar como "BSANTANDER", que hace referencia a la empresa "BANCO SANTANDER CHILE", y no solamente "BANCO SANTANDER". En Chile, es el banco más grande del país. Este banco pertenece a la industria de la banca (industria financiera), cuyo sector ofrece servicios financieros, como por ejemplo ofrecer prestamos personales. En "[Web of Science](https://www.webofscience.com/wos/woscc/full-record/WOS:000436492100012)", encontré un articulo de @du2018 sobre el efecto de bancos extranjeros en la "performance" o rendimiento de bancos, en paises en vías de desarrollo, el cual explicaré un poco mas a fondo en la sección de motivación. Lo interesante del paper es que analiza el efecto de bancos extranjeros en Chile.
 
 ```{r ETL}
 #| echo: false
