@@ -166,3 +166,181 @@ Los pesos para el portafolio son:
 -   15% inmobiliaria (Parque Arauco)
 
 Escogimos esta distribución ya que actualmente, con las altas tasas de interés, producto de la inflación, los bancos han generado un mayor retorno, lo cual incrementa el ingreso y por ende tienen más dinero para realizar inversiones, lo que puede provocar un aumento en su precio de acción. Sumado a esto, Banco Santander Chile ha realizado varias inversiones últimamente, como el aumento de cajeros automaticos. Es debido a esto que le otorgamos un 50% de peso al banco, ya que es la entidad que más retornos nos va a producir. Para poder diversificar el portafolio, le colocamos un 35% al sector de energía, ya que es un sector "neutro", al cual no le ha ido bien ni mal, sin embargo es un sector de commodity, por lo cual es usado por toda la población y por ende, su aumento o disminución en el precio no es muy notable. Además de eso, Copec es una empresa que ha invertido en movilidad electrica, por lo que creemos que a largo plazo, este activo nos va a generar rentabilidad. Finalmente, otorgamos un 15% al sector inmobiliario, ya que actualmente es un sector que ha sido muy repercutido por la inflación y las altas tasas de interés, lo que produjo que su precio de acción disminuyera bastante. Creemos que esta tendencia seguirá, por lo que le otorgamos un menor peso en el portafolio. Por el otro lado, últimamente, Parque Arauco ha realizado inversiones en el extranjero, por lo que creemos que en un futuro, el precio de la acción va a incrementar, pero no en gran medida, debido a lo dañado que esta el sector de la inmobiliaria. Es debido a esto, que le otorgamos un peso "alto" a pesar de lo afectado que esta el área.
+
+### Aplicación Black-Scholes
+
+Se va a calcular una put para el activo del Banco Santander Chile. Según el paper de [@black1973pricing], el modelo de Black-Scholes requiere de 5 párametros para poder ser calculados. Estos son:
+
+S: Precio de la acción.
+
+K: Precio del ejercicio (Strike price).
+
+R: Tasa libre de riesgo (bono emitido por la tesorería).
+
+Sigma: Variación rendimiento de la acción.
+
+T: Tiempo para vencimiento en años.
+
+A continuación, se presenta un código python que se conecta a la API de yahoo finance, para así obtener los 5 factores y lograr calcular el precio de una put, de una opción del Banco Santander Chile que vence el 17 de noviembre de 2023. El symbolo de esta opción es: "BSAC231117P00017500".
+
+```{python}
+#| echo: false
+import yfinance as yf
+from datetime import datetime as dt
+import datetime
+from scipy.stats import norm
+import math
+
+def black_scholes(S, K, T, r, sigma):
+    numerador = (math.log(S / K) + (r + (sigma ** 2) / 2) * T)
+    denominador = (sigma * math.sqrt(T))
+    d1 =  numerador / denominador
+    d2 = d1 - sigma * math.sqrt(T)
+    precio_opcion = K * math.exp(-r * T) * norm.cdf(-d2) - S * norm.cdf(-d1) #Estamos calculando una put
+    return precio_opcion
+
+banco_santander = "BSAC" #Symbolo del banco santander
+ticker = yf.Ticker(banco_santander) #Se obtiene el ticker del banco santander
+precio = ticker.info["open"] #Se obtiene el precio actual de la acción (S)
+accion = yf.download(banco_santander, start = "2023-01-01", end = dt.now(), interval = "1mo")["Adj Close"]#Resultados del precio accion
+retorno_accion = (accion - accion.shift(1))/accion.shift(1) #variacion de los retornos de la accion
+var_retornos = retorno_accion.std() #variacion de los retornos del ultimo mes (sigma)
+
+banco_santander_opcion = "BSAC231117P00017500" #Symbolo de una opcion del banco santander
+info_opcion = yf.Ticker(banco_santander_opcion) #Se crea ticker con la informacion de la opcion
+strike = info_opcion.info["strikePrice"] #Se obtiene el strike price de la opcion (K)
+fecha_termino_utc = info_opcion.info["expireDate"] #Se obtiene la fecha de termino de la opcion en formato UTC
+fecha_termino = datetime.datetime.utcfromtimestamp(fecha_termino_utc) #Se pasa del formato UTC a formato de fecha.
+fecha_actual = dt.now() #Se obtiene la fecha actual
+tiempo_para_vencimiento = (fecha_termino - fecha_actual).days #Se hace una resta entre la fecha de termino y la actual para obtener el tiempo hasta el vencimiento de la opcion (t).
+
+symbolo_bono = "^IRX" #Symbolo de un bono de la tesorería
+bono = yf.download(symbolo_bono, start="2023-01-01", end=dt.now(), interval = "1d")["Close"] #Resultados del bono de la tesorería
+rf = bono[-1]/100 #Se obtiene el rendimiento del bono mas reciente y se convierte a porcentaje (R).
+
+K = strike
+r = rf
+sigma = var_retornos
+T = tiempo_para_vencimiento/365 #Se pasan dias a años
+S = precio
+
+precio_opcion = black_scholes(S, K, T, r, sigma)
+print(f"El precio de la opción put calculado con black and scholes es: {precio_opcion}")
+```
+
+### Modelo Adicional de valorizacion
+
+El modelo alternativo que voy a utilizar para poder calcular el precio de una opción put del Banco Santander Chile, es el método de Montecarlo presentado en el libro de "*Options, Futures and Other Derivatives*" [@hull2017]. Este modelo, es un modelo probabilistico y estadistico, que valua variables aleatorias. En el caso de las opciones, valua el precio futuro del activo subyactente. Este modelo, nos crea infinitos escenarios posibles que pueden ocurrir en un futuro, para así obtener el valor de la opción. En cada uno de estos escenarios, se calcula el valor de la opción en la fecha de vencimiento, observando si se ejercerá la opción (put en este caso), junto con el pago correspondiente. Luego, se calcula el promedio del valor de la opción en todos estos escenarios, lo cual equivale a una estimación del valor de la opción. Finalmente, se descuenta la estimación, trayendo el valor en la fecha de vencimiento al valor presente, utilizando como tasa de descuento la tasa libre de riesgo. La formula utilizada para este modelo es la siguiente:
+
+![](photos/Captura%20de%20Pantalla%202023-10-21%20a%20la(s)%2010.35.50.png)
+
+Esta formula se obtiene del libro de "*Options, Futures and Other Derivatives*" [@hull2017].
+
+Cada parámetro significa:
+
+S(t): Precio inicial del activo subyacente (acción de Banco Santander Chile)
+
+u: Tasa libre de riesgo (bono emitido por la tesorería)
+
+sigma: Variación rendimiento de la acción (volatilidad de la acción Banco Santander Chile)
+
+t: Tiempo hasta el vencimiento en años.
+
+e: Numero aleatrio de una distribución normal con media 0 y desviación estándar 1.
+
+### Aplicacion modelo adicional
+
+```{python}
+#| echo: false
+
+import numpy as np
+import yfinance as yf
+from datetime import datetime as dt
+import datetime
+from scipy.stats import norm
+import math
+
+def metodo_montecarlo(S0, K, T, r, sigma, n_simulations):
+  np.random.seed(0) #Se crea la semilla random
+  numero_random = np.random.normal(0, 1, n_simulations) #Se generan numeros aleatorios con la distribucion normal, para el numero de simulaciones.
+  S_T = S0 * np.exp((r - 0.5 * sigma**2) * T + sigma * np.sqrt(T) * numero_random) #Valor de la opcion en la fecha de vencimiento
+
+  precio_si_ejerce = np.maximum(K - S_T, 0) #Ver si se ejerce la put
+
+  precio = np.mean(precio_si_ejerce) #Se calcula el valor promedio de los pagos
+
+  precio = np.exp(-r * T) * precio #Se trae a valor presente
+
+  return precio
+
+banco_santander = "BSAC" #Symbolo del banco santander
+ticker = yf.Ticker(banco_santander) #Se obtiene el ticker del banco santander
+precio = ticker.info["open"] #Se obtiene el precio actual de la acción (S)
+accion = yf.download(banco_santander, start = "2023-01-01", end = dt.now(), interval = "1mo")["Adj Close"]#Resultados del precio accion
+retorno_accion = (accion - accion.shift(1))/accion.shift(1) #variacion de los retornos de la accion
+var_retornos = retorno_accion.std() #variacion de los retornos del ultimo mes (sigma)
+
+banco_santander_opcion = "BSAC231117P00017500" #Symbolo de una opcion del banco santander
+info_opcion = yf.Ticker(banco_santander_opcion) #Se crea ticker con la informacion de la opcion
+strike = info_opcion.info["strikePrice"] #Se obtiene el strike price de la opcion (K)
+fecha_termino_utc = info_opcion.info["expireDate"] #Se obtiene la fecha de termino de la opcion en formato UTC
+fecha_termino = datetime.datetime.utcfromtimestamp(fecha_termino_utc) #Se pasa del formato UTC a formato de fecha.
+fecha_actual = dt.now() #Se obtiene la fecha actual
+tiempo_para_vencimiento = (fecha_termino - fecha_actual).days #Se hace una resta entre la fecha de termino y la actual para obtener el tiempo hasta el vencimiento de la opcion (t).
+
+symbolo_bono = "^IRX" #Symbolo de un bono de la tesorería
+bono = yf.download(symbolo_bono, start="2023-01-01", end=dt.now(), interval = "1d")["Close"] #Resultados del bono de la tesorería
+rf = bono[-1]/100 #Se obtiene el rendimiento del bono mas reciente y se convierte a porcentaje (R).
+
+K = strike
+r = rf
+sigma = var_retornos
+T = tiempo_para_vencimiento/365 #Se pasan dias a años
+S0 = precio
+n_simulations = 1000
+
+precio = metodo_montecarlo(S0, K, T, r, sigma, n_simulations)
+print(f"El precio de la opción put calculado con Montecarlo es: {precio:}")
+
+
+```
+
+### Análisis de contraste de ambos modelos
+
+El resultado obtenido al momento de la última vez que corrí el código para el metodo black and scholes fue de 0.137 dólares, mientras que para el metodo de montecarlo fue de 0.144 dólares. Una razón por la cual el resultado obtenido por el modelo de black and scholes es diferente al obtenido por el metodo de montecarlo, puede ser, debido al incumplimiento de los supuestos del modelo, lo cual se explicará mas en detalle en el siguiente parrafo.
+
+Esta diferencia de precios puede ser ocasionada, debido a que el metodo de black and scholes tiene supuestos diferentes a los del metodo de montecarlo. Por ejemplo, el metodo de black and scholes utiliza el supuesto de la eficiencia de los mercados, supuesto que no se cumple cuando hay alta volatilidad o resultados inesperados en el mercado. En el caso de la acción del Banco Santander Chile, esta tiene una volatilidad del 0.07, la cual no es una volatilidad alta. Otro supuesto que utiliza el metodo de black and scholes es que el activo no paga dividendos, en el caso de la acción del Banco Santander Chile, esta si paga dividendos, lo cual puede producir que el resultado entregado por parte del modelo sea diferente al del metodo de montecarlo. Por el otro lado, alguno de los supuestos del metodo de montecarlo que podrían afectar el resultado obtenido son que, este metodo considera que la tasa libre de riesgo es constante, para así poder traer el valor futuro al valor presente. Sin embargo, en la práctica, el valor de la tasa libre de riesgo no es constante, y actualmente tiene un valor considerablemente alto (5.3%) con respecto a años anteriores. Al tener una tasa libre de riesgo mas alta, ocasiona que el valor presente de los flujos sea menor que si se utiliza una tasa menor. Esto es un factor clave al considerar el porque se obtuvo un precio bajo para el valor de la opción put del Banco Santander Chile al utilizar el metodo de montecarlo.
+
+Sin embargo, ambos modelos tienen similitudes, como por ejemplo que utilizan los mismos parametros para poder calcular el precio de la opción (S, K, sigma, R y T). Es relevante notar que utilizan los mismos parametros, ya que se estan colocando los mismos valores en la función, donde lo unico que cambia es la formula que se utiliza.
+
+### Reporte Grupal: Caso Administración
+
+Se escogió replicar el caso de administración de efectivo de Braam Industries para el activo de Banco Santander Chile. Lo primero que se tuvo que hacer fue obtener los parámetros de ventas anuales, tasa de incumplimiento, costos administrativos, periodo de cuentas por cobrar, costos variables y tasa de intéres. Estos parámetros son entregados en el enunciado para Braam Industries, por lo cual tuvimos que encontrar los mismos pero que aplicaran a Banco Santander Chile.
+
+Ventas anuales: Se buscó en los estados financieros de Banco Santander Chile los ingresos totales.
+
+Tasa de incumplimiento: En el caso de los bancos, esta corresponde a la tasa de morosidad, la cual fue extraída de la página de la CMF Chile.
+
+Costos administrativos: Se dividió los gastos operacionales entre los ingresos totales. Con esto se obtuvo el porcentaje de costos administrativos. Los gastos operacionales se extrayeron de los estados financieros de Banco Santander Chile.
+
+Periodo de cuentas por cobrar: Los bancos tienen por lo general diferentes periodos de cuentas por cobrar, pero se escogió el valor de 1 mes (30 días).
+
+Costos variables: Se dividió los costos variables de administración del banco entre los gastos operacionales, que serían los costos totales de operación del banco. Con esto se obtuvo el porcentaje de costos variables. Ambos datos se extrayeron del estado de resultados.
+
+Tasa de intéres: Se utilizó la tasa de intéres que actualmente tiene Chile.
+
+A continuación se presentan los parámetros obtenidos:
+
+![](photos/Captura%20de%20Pantalla%202023-10-25%20a%20la(s)%2019.32.52.png)
+
+Una vez que se obtuvieron los parametros, se procedió a armar la tabla que se nos presentó en el caso, con la política actual y 3 opciones hipotéticas. Estas opciones eran, relajar la decisión de cuando la compañia debe otorgar créditos, aumentar el periodo de crédito y finalmente una combinación entre la opción 1 y la opción 2. Con esto en mente, se obtuvo la siguiente tabla:
+
+![](photos/Captura%20de%20Pantalla%202023-10-25%20a%20la(s)%2019.36.57.png)
+
+Una vez que se tenían todos los valores para cada una de las opciones, se procedió a calcular el VPN de cada politica, para saber cual era la mas rentable. Para ello, se desarrollo la siguiente tabla con el fin de calcular el VPN de cada alternativa:
+
+![](photos/Captura%20de%20Pantalla%202023-10-25%20a%20la(s)%2020.01.51.png){width="448"}
+
+En base a lo calculado en la tabla de Excel, se puede concluir que el VPN de la politica actual es el más grande por lo que la empresa se debería quedar con la misma politica que tiene. La principal razón por la cual se obtuvo este resultado, es debido a que es la alternativa con el porcentaje de costo administrativo mas bajo y una tasa de morosidad mas baja, por lo que los gastos son menores. Al tener estos 2 indices bajos, el numerador del VPN es mayor (flujo de ingresos menos gastos), por lo cual se tiene un VPN mas grande.
+
+Por otro lado, según lo presentado en la tabla, la opción 3 tiene una tasa de morosidad y un porcentaje de costos administrativos mas altos que la opción 2, por lo que la afirmación es erronea.

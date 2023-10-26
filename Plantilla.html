@@ -190,13 +190,94 @@ div.csl-indent {
 <li><p>15% inmobiliaria (Parque Arauco)</p></li>
 </ul>
 <p>Escogimos esta distribución ya que actualmente, con las altas tasas de interés, producto de la inflación, los bancos han generado un mayor retorno, lo cual incrementa el ingreso y por ende tienen más dinero para realizar inversiones, lo que puede provocar un aumento en su precio de acción. Sumado a esto, Banco Santander Chile ha realizado varias inversiones últimamente, como el aumento de cajeros automaticos. Es debido a esto que le otorgamos un 50% de peso al banco, ya que es la entidad que más retornos nos va a producir. Para poder diversificar el portafolio, le colocamos un 35% al sector de energía, ya que es un sector “neutro”, al cual no le ha ido bien ni mal, sin embargo es un sector de commodity, por lo cual es usado por toda la población y por ende, su aumento o disminución en el precio no es muy notable. Además de eso, Copec es una empresa que ha invertido en movilidad electrica, por lo que creemos que a largo plazo, este activo nos va a generar rentabilidad. Finalmente, otorgamos un 15% al sector inmobiliario, ya que actualmente es un sector que ha sido muy repercutido por la inflación y las altas tasas de interés, lo que produjo que su precio de acción disminuyera bastante. Creemos que esta tendencia seguirá, por lo que le otorgamos un menor peso en el portafolio. Por el otro lado, últimamente, Parque Arauco ha realizado inversiones en el extranjero, por lo que creemos que en un futuro, el precio de la acción va a incrementar, pero no en gran medida, debido a lo dañado que esta el sector de la inmobiliaria. Es debido a esto, que le otorgamos un peso “alto” a pesar de lo afectado que esta el área.</p>
+</section>
+<section id="aplicación-black-scholes" class="level3">
+<h3 class="anchored" data-anchor-id="aplicación-black-scholes">Aplicación Black-Scholes</h3>
+<p>Se va a calcular una put para el activo del Banco Santander Chile. Según el paper de <span class="citation" data-cites="black1973pricing">(<a href="#ref-black1973pricing" role="doc-biblioref">Black, Scholes, y Merton 1973</a>)</span>, el modelo de Black-Scholes requiere de 5 párametros para poder ser calculados. Estos son:</p>
+<p>S: Precio de la acción.</p>
+<p>K: Precio del ejercicio (Strike price).</p>
+<p>R: Tasa libre de riesgo (bono emitido por la tesorería).</p>
+<p>Sigma: Variación rendimiento de la acción.</p>
+<p>T: Tiempo para vencimiento en años.</p>
+<p>A continuación, se presenta un código python que se conecta a la API de yahoo finance, para así obtener los 5 factores y lograr calcular el precio de una put, de una opción del Banco Santander Chile que vence el 17 de noviembre de 2023. El symbolo de esta opción es: “BSAC231117P00017500”.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[*********************100%%**********************]  1 of 1 completed</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[*********************100%%**********************]  1 of 1 completed</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>El precio de la opción put calculado con black and scholes es: 0.1381439021198947</code></pre>
+</div>
+</div>
+</section>
+<section id="modelo-adicional-de-valorizacion" class="level3">
+<h3 class="anchored" data-anchor-id="modelo-adicional-de-valorizacion">Modelo Adicional de valorizacion</h3>
+<p>El modelo alternativo que voy a utilizar para poder calcular el precio de una opción put del Banco Santander Chile, es el método de Montecarlo presentado en el libro de “<em>Options, Futures and Other Derivatives</em>” <span class="citation" data-cites="hull2017">(<a href="#ref-hull2017" role="doc-biblioref">Hull 2017</a>)</span>. Este modelo, es un modelo probabilistico y estadistico, que valua variables aleatorias. En el caso de las opciones, valua el precio futuro del activo subyactente. Este modelo, nos crea infinitos escenarios posibles que pueden ocurrir en un futuro, para así obtener el valor de la opción. En cada uno de estos escenarios, se calcula el valor de la opción en la fecha de vencimiento, observando si se ejercerá la opción (put en este caso), junto con el pago correspondiente. Luego, se calcula el promedio del valor de la opción en todos estos escenarios, lo cual equivale a una estimación del valor de la opción. Finalmente, se descuenta la estimación, trayendo el valor en la fecha de vencimiento al valor presente, utilizando como tasa de descuento la tasa libre de riesgo. La formula utilizada para este modelo es la siguiente:</p>
+<p><img src="photos/Captura%20de%20Pantalla%202023-10-21%20a%20la(s)%2010.35.50.png" class="img-fluid"></p>
+<p>Esta formula se obtiene del libro de “<em>Options, Futures and Other Derivatives</em>” <span class="citation" data-cites="hull2017">(<a href="#ref-hull2017" role="doc-biblioref">Hull 2017</a>)</span>.</p>
+<p>Cada parámetro significa:</p>
+<p>S(t): Precio inicial del activo subyacente (acción de Banco Santander Chile)</p>
+<p>u: Tasa libre de riesgo (bono emitido por la tesorería)</p>
+<p>sigma: Variación rendimiento de la acción (volatilidad de la acción Banco Santander Chile)</p>
+<p>t: Tiempo hasta el vencimiento en años.</p>
+<p>e: Numero aleatrio de una distribución normal con media 0 y desviación estándar 1.</p>
+</section>
+<section id="aplicacion-modelo-adicional" class="level3">
+<h3 class="anchored" data-anchor-id="aplicacion-modelo-adicional">Aplicacion modelo adicional</h3>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[*********************100%%**********************]  1 of 1 completed</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+[*********************100%%**********************]  1 of 1 completed</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>El precio de la opción put calculado con Montecarlo es: 0.14413834497833364</code></pre>
+</div>
+</div>
+</section>
+<section id="análisis-de-contraste-de-ambos-modelos" class="level3">
+<h3 class="anchored" data-anchor-id="análisis-de-contraste-de-ambos-modelos">Análisis de contraste de ambos modelos</h3>
+<p>El resultado obtenido al momento de la última vez que corrí el código para el metodo black and scholes fue de 0.137 dólares, mientras que para el metodo de montecarlo fue de 0.144 dólares. Una razón por la cual el resultado obtenido por el modelo de black and scholes es diferente al obtenido por el metodo de montecarlo, puede ser, debido al incumplimiento de los supuestos del modelo, lo cual se explicará mas en detalle en el siguiente parrafo.</p>
+<p>Esta diferencia de precios puede ser ocasionada, debido a que el metodo de black and scholes tiene supuestos diferentes a los del metodo de montecarlo. Por ejemplo, el metodo de black and scholes utiliza el supuesto de la eficiencia de los mercados, supuesto que no se cumple cuando hay alta volatilidad o resultados inesperados en el mercado. En el caso de la acción del Banco Santander Chile, esta tiene una volatilidad del 0.07, la cual no es una volatilidad alta. Otro supuesto que utiliza el metodo de black and scholes es que el activo no paga dividendos, en el caso de la acción del Banco Santander Chile, esta si paga dividendos, lo cual puede producir que el resultado entregado por parte del modelo sea diferente al del metodo de montecarlo. Por el otro lado, alguno de los supuestos del metodo de montecarlo que podrían afectar el resultado obtenido son que, este metodo considera que la tasa libre de riesgo es constante, para así poder traer el valor futuro al valor presente. Sin embargo, en la práctica, el valor de la tasa libre de riesgo no es constante, y actualmente tiene un valor considerablemente alto (5.3%) con respecto a años anteriores. Al tener una tasa libre de riesgo mas alta, ocasiona que el valor presente de los flujos sea menor que si se utiliza una tasa menor. Esto es un factor clave al considerar el porque se obtuvo un precio bajo para el valor de la opción put del Banco Santander Chile al utilizar el metodo de montecarlo.</p>
+<p>Sin embargo, ambos modelos tienen similitudes, como por ejemplo que utilizan los mismos parametros para poder calcular el precio de la opción (S, K, sigma, R y T). Es relevante notar que utilizan los mismos parametros, ya que se estan colocando los mismos valores en la función, donde lo unico que cambia es la formula que se utiliza.</p>
+</section>
+<section id="reporte-grupal-caso-administración" class="level3">
+<h3 class="anchored" data-anchor-id="reporte-grupal-caso-administración">Reporte Grupal: Caso Administración</h3>
+<p>Se escogió replicar el caso de administración de efectivo de Braam Industries para el activo de Banco Santander Chile. Lo primero que se tuvo que hacer fue obtener los parámetros de ventas anuales, tasa de incumplimiento, costos administrativos, periodo de cuentas por cobrar, costos variables y tasa de intéres. Estos parámetros son entregados en el enunciado para Braam Industries, por lo cual tuvimos que encontrar los mismos pero que aplicaran a Banco Santander Chile.</p>
+<p>Ventas anuales: Se buscó en los estados financieros de Banco Santander Chile los ingresos totales.</p>
+<p>Tasa de incumplimiento: En el caso de los bancos, esta corresponde a la tasa de morosidad, la cual fue extraída de la página de la CMF Chile.</p>
+<p>Costos administrativos: Se dividió los gastos operacionales entre los ingresos totales. Con esto se obtuvo el porcentaje de costos administrativos. Los gastos operacionales se extrayeron de los estados financieros de Banco Santander Chile.</p>
+<p>Periodo de cuentas por cobrar: Los bancos tienen por lo general diferentes periodos de cuentas por cobrar, pero se escogió el valor de 1 mes (30 días).</p>
+<p>Costos variables: Se dividió los costos variables de administración del banco entre los gastos operacionales, que serían los costos totales de operación del banco. Con esto se obtuvo el porcentaje de costos variables. Ambos datos se extrayeron del estado de resultados.</p>
+<p>Tasa de intéres: Se utilizó la tasa de intéres que actualmente tiene Chile.</p>
+<p>A continuación se presentan los parámetros obtenidos:</p>
+<p><img src="photos/Captura%20de%20Pantalla%202023-10-25%20a%20la(s)%2019.32.52.png" class="img-fluid"></p>
+<p>Una vez que se obtuvieron los parametros, se procedió a armar la tabla que se nos presentó en el caso, con la política actual y 3 opciones hipotéticas. Estas opciones eran, relajar la decisión de cuando la compañia debe otorgar créditos, aumentar el periodo de crédito y finalmente una combinación entre la opción 1 y la opción 2. Con esto en mente, se obtuvo la siguiente tabla:</p>
+<p><img src="photos/Captura%20de%20Pantalla%202023-10-25%20a%20la(s)%2019.36.57.png" class="img-fluid"></p>
+<p>Una vez que se tenían todos los valores para cada una de las opciones, se procedió a calcular el VPN de cada politica, para saber cual era la mas rentable. Para ello, se desarrollo la siguiente tabla con el fin de calcular el VPN de cada alternativa:</p>
+<p><img src="photos/Captura%20de%20Pantalla%202023-10-25%20a%20la(s)%2020.01.51.png" class="img-fluid" width="448"></p>
+<p>En base a lo calculado en la tabla de Excel, se puede concluir que el VPN de la politica actual es el más grande por lo que la empresa se debería quedar con la misma politica que tiene. La principal razón por la cual se obtuvo este resultado, es debido a que es la alternativa con el porcentaje de costo administrativo mas bajo y una tasa de morosidad mas baja, por lo que los gastos son menores. Al tener estos 2 indices bajos, el numerador del VPN es mayor (flujo de ingresos menos gastos), por lo cual se tiene un VPN mas grande.</p>
+<p>Por otro lado, según lo presentado en la tabla, la opción 3 tiene una tasa de morosidad y un porcentaje de costos administrativos mas altos que la opción 2, por lo que la afirmación es erronea.</p>
 
 </section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">Referencias</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-black1973pricing" class="csl-entry" role="listitem">
+Black, Fischer, Myron Scholes, y Robert Merton. 1973. <span>«The Pricing of Options and Corporate Liabilities»</span>. <em>Journal of Political Economy</em> 81 (3): 637-54.
+</div>
 <div id="ref-du2018" class="csl-entry" role="listitem">
 Du, Brian, Alejandro Serrano, y Andre Vianna. 2018. <span>«Institutional Development and Foreign Banks in Chile»</span>. <em>International Review of Financial Analysis</em> 58 (julio): 166-78. <a href="https://doi.org/10.1016/j.irfa.2017.10.001">https://doi.org/10.1016/j.irfa.2017.10.001</a>.
+</div>
+<div id="ref-hull2017" class="csl-entry" role="listitem">
+Hull, John C. 2017. <em>Options, Futures, and Other Derivatives</em>. 9th ed. Pearson.
 </div>
 </div></section></div></main>
 <!-- /main column -->
