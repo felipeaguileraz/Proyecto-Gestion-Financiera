@@ -135,11 +135,13 @@ Bono titulizado emitido el 31 de julio:
 
 #### Caracterización de emisiones históricas
 
-El Banco Santander Chile ha realizado dos [emisiones de acciones](https://www.cmfchile.cl/institucional/estadisticas/acc_registro1.php?lang=es), la primera el 8 de octubre del año 1996, emitiendo un total de **196.919.579** acciones. La segunda emisión de acciones fue realizada el 12 de agosto del año 1998, emitiendo un total de **72.904.230** acciones. Respecto al proceso de emisión y al paso a paso, no fue posible encontrar información.
+El Banco Santander Chile ha realizado dos [emisiones de acciones](https://www.cmfchile.cl/institucional/estadisticas/acc_registro1.php?lang=es), la primera el 8 de octubre del año 1996, emitiendo un total de **196.919.579** acciones. La segunda emisión de acciones fue realizada el 12 de agosto del año 1998, emitiendo un total de **72.904.230** acciones. Respecto al proceso de emisión y al paso a paso, no fue posible encontrar información para el Banco Santander Chile.
 
 Emisión de acciones del Banco Santander Chile:
 
 ![](photos/Captura%20de%20Pantalla%202023-09-27%20a%20la(s)%2020.58.05.png){fig-align="center"}
+
+Sin embargo, se logró encontrar información con respecto a la emisión de acciones del Banco de Chile. Este banco, el 4 de mayo de 2011 emitió 1.398.023.524 acciones, donde realizó una oferta directa de derecho de suscripción, debido a que ofrecieron estas a los accionistas del banco y a los accionistas de SM-Chile. Cabe destacar que el banco al acordar la colocación de acciones, realizó la etapa de conferencias previas a la suscripción, presentación y aprobación de registro. Sumado a esto, el 16 de mayo de 2011 se realizó la etapa de "periodo de oferta preferente especial", donde se ofrecieron opciones de suscripción a accionistas preferentes del banco. Esta información fue obtenida del Diario Financiero [@emisionBC].
 
 #### Relación con activos derivados
 
@@ -198,7 +200,7 @@ def black_scholes(S, K, T, r, sigma):
     d2 = d1 - sigma * math.sqrt(T)
     precio_opcion = K * math.exp(-r * T) * norm.cdf(-d2) - S * norm.cdf(-d1) #Estamos calculando una put
     return precio_opcion
-
+"""
 banco_santander = "BSAC" #Symbolo del banco santander
 ticker = yf.Ticker(banco_santander) #Se obtiene el ticker del banco santander
 precio = ticker.info["open"] #Se obtiene el precio actual de la acción (S)
@@ -226,6 +228,7 @@ S = precio
 
 precio_opcion = black_scholes(S, K, T, r, sigma)
 print(f"El precio de la opción put calculado con black and scholes es: {precio_opcion}")
+"""
 ```
 
 ### Modelo Adicional de valorizacion
@@ -252,7 +255,7 @@ e: Numero aleatrio de una distribución normal con media 0 y desviación estánd
 
 ```{python}
 #| echo: false
-
+"""
 import numpy as np
 import yfinance as yf
 from datetime import datetime as dt
@@ -302,7 +305,7 @@ n_simulations = 1000
 precio = metodo_montecarlo(S0, K, T, r, sigma, n_simulations)
 print(f"El precio de la opción put calculado con Montecarlo es: {precio:}")
 
-
+"""
 ```
 
 ### Análisis de contraste de ambos modelos

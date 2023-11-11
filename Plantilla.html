@@ -163,13 +163,14 @@ div.csl-indent {
 </div>
 <section id="caracterización-de-emisiones-históricas" class="level4">
 <h4 class="anchored" data-anchor-id="caracterización-de-emisiones-históricas">Caracterización de emisiones históricas</h4>
-<p>El Banco Santander Chile ha realizado dos <a href="https://www.cmfchile.cl/institucional/estadisticas/acc_registro1.php?lang=es">emisiones de acciones</a>, la primera el 8 de octubre del año 1996, emitiendo un total de <strong>196.919.579</strong> acciones. La segunda emisión de acciones fue realizada el 12 de agosto del año 1998, emitiendo un total de <strong>72.904.230</strong> acciones. Respecto al proceso de emisión y al paso a paso, no fue posible encontrar información.</p>
+<p>El Banco Santander Chile ha realizado dos <a href="https://www.cmfchile.cl/institucional/estadisticas/acc_registro1.php?lang=es">emisiones de acciones</a>, la primera el 8 de octubre del año 1996, emitiendo un total de <strong>196.919.579</strong> acciones. La segunda emisión de acciones fue realizada el 12 de agosto del año 1998, emitiendo un total de <strong>72.904.230</strong> acciones. Respecto al proceso de emisión y al paso a paso, no fue posible encontrar información para el Banco Santander Chile.</p>
 <p>Emisión de acciones del Banco Santander Chile:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="photos/Captura%20de%20Pantalla%202023-09-27%20a%20la(s)%2020.58.05.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
+<p>Sin embargo, se logró encontrar información con respecto a la emisión de acciones del Banco de Chile. Este banco, el 4 de mayo de 2011 emitió 1.398.023.524 acciones, donde realizó una oferta directa de derecho de suscripción, debido a que ofrecieron estas a los accionistas del banco y a los accionistas de SM-Chile. Cabe destacar que el banco al acordar la colocación de acciones, realizó la etapa de conferencias previas a la suscripción, presentación y aprobación de registro. Sumado a esto, el 16 de mayo de 2011 se realizó la etapa de “periodo de oferta preferente especial”, donde se ofrecieron opciones de suscripción a accionistas preferentes del banco. Esta información fue obtenida del Diario Financiero <span class="citation" data-cites="emisionBC">(<a href="#ref-emisionBC" role="doc-biblioref">Diario Financiero Online 2011</a>)</span>.</p>
 </section>
 <section id="relación-con-activos-derivados" class="level4">
 <h4 class="anchored" data-anchor-id="relación-con-activos-derivados">Relación con activos derivados</h4>
@@ -202,15 +203,7 @@ div.csl-indent {
 <p>A continuación, se presenta un código python que se conecta a la API de yahoo finance, para así obtener los 5 factores y lograr calcular el precio de una put, de una opción del Banco Santander Chile que vence el 17 de noviembre de 2023. El symbolo de esta opción es: “BSAC231117P00017500”.</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>
-[*********************100%%**********************]  1 of 1 completed</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-[*********************100%%**********************]  1 of 1 completed</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>El precio de la opción put calculado con black and scholes es: 0.1381439021198947</code></pre>
+<pre><code>'\nbanco_santander = "BSAC" #Symbolo del banco santander\nticker = yf.Ticker(banco_santander) #Se obtiene el ticker del banco santander\nprecio = ticker.info["open"] #Se obtiene el precio actual de la acción (S)\naccion = yf.download(banco_santander, start = "2023-01-01", end = dt.now(), interval = "1mo")["Adj Close"]#Resultados del precio accion\nretorno_accion = (accion - accion.shift(1))/accion.shift(1) #variacion de los retornos de la accion\nvar_retornos = retorno_accion.std() #variacion de los retornos del ultimo mes (sigma)\n\nbanco_santander_opcion = "BSAC231117P00017500" #Symbolo de una opcion del banco santander\ninfo_opcion = yf.Ticker(banco_santander_opcion) #Se crea ticker con la informacion de la opcion\nstrike = info_opcion.info["strikePrice"] #Se obtiene el strike price de la opcion (K)\nfecha_termino_utc = info_opcion.info["expireDate"] #Se obtiene la fecha de termino de la opcion en formato UTC\nfecha_termino = datetime.datetime.utcfromtimestamp(fecha_termino_utc) #Se pasa del formato UTC a formato de fecha.\nfecha_actual = dt.now() #Se obtiene la fecha actual\ntiempo_para_vencimiento = (fecha_termino - fecha_actual).days #Se hace una resta entre la fecha de termino y la actual para obtener el tiempo hasta el vencimiento de la opcion (t).\n\nsymbolo_bono = "^IRX" #Symbolo de un bono de la tesorería\nbono = yf.download(symbolo_bono, start="2023-01-01", end=dt.now(), interval = "1d")["Close"] #Resultados del bono de la tesorería\nrf = bono[-1]/100 #Se obtiene el rendimiento del bono mas reciente y se convierte a porcentaje (R).\n\nK = strike\nr = rf\nsigma = var_retornos\nT = tiempo_para_vencimiento/365 #Se pasan dias a años\nS = precio\n\nprecio_opcion = black_scholes(S, K, T, r, sigma)\nprint(f"El precio de la opción put calculado con black and scholes es: {precio_opcion}")\n'</code></pre>
 </div>
 </div>
 </section>
@@ -230,15 +223,7 @@ div.csl-indent {
 <h3 class="anchored" data-anchor-id="aplicacion-modelo-adicional">Aplicacion modelo adicional</h3>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>
-[*********************100%%**********************]  1 of 1 completed</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-[*********************100%%**********************]  1 of 1 completed</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>El precio de la opción put calculado con Montecarlo es: 0.14413834497833364</code></pre>
+<pre><code>'\nimport numpy as np\nimport yfinance as yf\nfrom datetime import datetime as dt\nimport datetime\nfrom scipy.stats import norm\nimport math\n\ndef metodo_montecarlo(S0, K, T, r, sigma, n_simulations):\n  np.random.seed(0) #Se crea la semilla random\n  numero_random = np.random.normal(0, 1, n_simulations) #Se generan numeros aleatorios con la distribucion normal, para el numero de simulaciones.\n  S_T = S0 * np.exp((r - 0.5 * sigma**2) * T + sigma * np.sqrt(T) * numero_random) #Valor de la opcion en la fecha de vencimiento\n\n  precio_si_ejerce = np.maximum(K - S_T, 0) #Ver si se ejerce la put\n\n  precio = np.mean(precio_si_ejerce) #Se calcula el valor promedio de los pagos\n\n  precio = np.exp(-r * T) * precio #Se trae a valor presente\n\n  return precio\n\nbanco_santander = "BSAC" #Symbolo del banco santander\nticker = yf.Ticker(banco_santander) #Se obtiene el ticker del banco santander\nprecio = ticker.info["open"] #Se obtiene el precio actual de la acción (S)\naccion = yf.download(banco_santander, start = "2023-01-01", end = dt.now(), interval = "1mo")["Adj Close"]#Resultados del precio accion\nretorno_accion = (accion - accion.shift(1))/accion.shift(1) #variacion de los retornos de la accion\nvar_retornos = retorno_accion.std() #variacion de los retornos del ultimo mes (sigma)\n\nbanco_santander_opcion = "BSAC231117P00017500" #Symbolo de una opcion del banco santander\ninfo_opcion = yf.Ticker(banco_santander_opcion) #Se crea ticker con la informacion de la opcion\nstrike = info_opcion.info["strikePrice"] #Se obtiene el strike price de la opcion (K)\nfecha_termino_utc = info_opcion.info["expireDate"] #Se obtiene la fecha de termino de la opcion en formato UTC\nfecha_termino = datetime.datetime.utcfromtimestamp(fecha_termino_utc) #Se pasa del formato UTC a formato de fecha.\nfecha_actual = dt.now() #Se obtiene la fecha actual\ntiempo_para_vencimiento = (fecha_termino - fecha_actual).days #Se hace una resta entre la fecha de termino y la actual para obtener el tiempo hasta el vencimiento de la opcion (t).\n\nsymbolo_bono = "^IRX" #Symbolo de un bono de la tesorería\nbono = yf.download(symbolo_bono, start="2023-01-01", end=dt.now(), interval = "1d")["Close"] #Resultados del bono de la tesorería\nrf = bono[-1]/100 #Se obtiene el rendimiento del bono mas reciente y se convierte a porcentaje (R).\n\nK = strike\nr = rf\nsigma = var_retornos\nT = tiempo_para_vencimiento/365 #Se pasan dias a años\nS0 = precio\nn_simulations = 1000\n\nprecio = metodo_montecarlo(S0, K, T, r, sigma, n_simulations)\nprint(f"El precio de la opción put calculado con Montecarlo es: {precio:}")\n\n'</code></pre>
 </div>
 </div>
 </section>
@@ -272,6 +257,9 @@ div.csl-indent {
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">Referencias</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-black1973pricing" class="csl-entry" role="listitem">
 Black, Fischer, Myron Scholes, y Robert Merton. 1973. <span>«The Pricing of Options and Corporate Liabilities»</span>. <em>Journal of Political Economy</em> 81 (3): 637-54.
+</div>
+<div id="ref-emisionBC" class="csl-entry" role="listitem">
+Diario Financiero Online. 2011. <span>«Banco de Chile anunció exitosa colocación del 94»</span>. <em>Diario Financiero</em>. <a href="https://www.df.cl/mercados/mercados-en-accion/banco-de-chile-anuncio-exitosa-colocacion-del-94-de-acciones">https://www.df.cl/mercados/mercados-en-accion/banco-de-chile-anuncio-exitosa-colocacion-del-94-de-acciones</a>.
 </div>
 <div id="ref-du2018" class="csl-entry" role="listitem">
 Du, Brian, Alejandro Serrano, y Andre Vianna. 2018. <span>«Institutional Development and Foreign Banks in Chile»</span>. <em>International Review of Financial Analysis</em> 58 (julio): 166-78. <a href="https://doi.org/10.1016/j.irfa.2017.10.001">https://doi.org/10.1016/j.irfa.2017.10.001</a>.
